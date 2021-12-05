@@ -48,7 +48,7 @@ class UserServiceTest {
     @DisplayName("loadUserByUsername user found")
     void returnUserDetailsWhenUserFound() {
         when(mockUserMapper.findUserByUsername("username"))
-                .thenReturn(new User(1,"username","encodedPassword"));
+                .thenReturn(new User(1, "username", "encodedPassword"));
         UserDetails userDetails = userService.loadUserByUsername("username");
         Assertions.assertAll("user info",
                 () -> Assertions.assertEquals("username", userDetails.getUsername()),
