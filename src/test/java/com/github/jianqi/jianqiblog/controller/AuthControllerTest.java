@@ -50,7 +50,14 @@ class AuthControllerTest {
     }
 
     @Test
-    void beforeAndAfterLogin() throws Exception {
+    void testLoginAndLogout() throws Exception {
+        Mockito.when(userService.loadUserByUsername("randomUser"))
+                .thenReturn(new User("randomUser", encoder.encode("randomPassword"),
+                        Collections.emptyList()));
+
+        Mockito.when(userService.getUserByUsername("randomUser"))
+                .thenReturn(new com.github.jianqi.jianqiblog.entity.User(
+                        1, "randomUser", encoder.encode("randomPassword")));
         // before login
         mvc.perform(get("/auth")).andExpect(status().isOk())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse()
@@ -61,15 +68,7 @@ class AuthControllerTest {
         userInfo.put("username", "randomUser");
         userInfo.put("password", "randomPassword");
 
-        Mockito.when(userService.loadUserByUsername("randomUser"))
-                .thenReturn(new User("randomUser", encoder.encode("randomPassword"),
-                        Collections.emptyList()));
-
-        Mockito.when(userService.getUserByUsername("randomUser"))
-                .thenReturn(new com.github.jianqi.jianqiblog.entity.User(
-                        1, "randomUser", encoder.encode("randomPassword")));
-
-        MvcResult response =  mvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
+        MvcResult response = mvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(userInfo)))
                 .andExpect(status().isOk())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse()
@@ -80,7 +79,30 @@ class AuthControllerTest {
         HttpSession session = response.getRequest().getSession();
         mvc.perform(get("/auth").session((MockHttpSession) Objects.requireNonNull(session)))
                 .andExpect(status().isOk())
-                .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("randomUser")));
+                .andExpect(result ->
+                        Assertions.assertTrue(result.getResponse().getContentAsString().contains("randomUser")));
 
+        mvc.perform(get("/auth/logout").session((MockHttpSession) session))
+                .andExpect(status().isOk())
+                .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("successfully logged out!")));
+    }
+
+    @Test
+    void newUserIsAbleToRegister() throws Exception {
+        Map<String, String> userInfo = new HashMap<>();
+        userInfo.put("username", "randomUser");
+        userInfo.put("password", "randomPassword");
+
+        Mockito.doNothing().when(userService).saveUserNameAndPassword("randomUser", "randomPassword");
+
+        Mockito.when(userService.getUserByUsername("randomUser"))
+                .thenReturn(new com.github.jianqi.jianqiblog.entity.User(1, "randomUser", "encryptedRandomPassword"));
+
+        mvc.perform(post("/auth/register").contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(userInfo)))
+                .andExpect(status().isOk())
+                .andExpect(result ->
+                        Assertions.assertTrue(result.getResponse().getContentAsString()
+                                .contains("\"msg\":\"registry is successful\"")));
     }
 }
