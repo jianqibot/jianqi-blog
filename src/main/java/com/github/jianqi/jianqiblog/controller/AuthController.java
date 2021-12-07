@@ -41,7 +41,7 @@ public class AuthController {
     public AuthReturn auth() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication == null ? null : authentication.getName();
-        if (username == null) {
+        if (username == null || username.contains("anonymous")) {
             return AuthReturn.failureResult("ok", null);
         } else {
             return AuthReturn.successfulResult("ok", null, userService.getUserByUsername(username));
