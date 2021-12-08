@@ -1,10 +1,12 @@
 version: 2
 jobs:
   test:
-    machine:
-      image: ubuntu-1604:202007-01
+    docker:
+      - image: cimg/openjdk:11.0
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 19.03.13
       - restore_cache:
           key: hcsp-{{ checksum "pom.xml" }}
       - run:
