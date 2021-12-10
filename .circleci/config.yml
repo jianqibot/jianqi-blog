@@ -1,0 +1,23 @@
+	version: 2
+jobs:
+  test:
+    docker:
+      - image: cimg/openjdk:11.0
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+      - restore_cache:
+          key: zjq-{{ checksum "pom.xml" }}
+      - run:
+          name: Run Maven Test
+          command: mvn test -PmavenCentral
+      - save_cache: # saves the project dependencies
+          paths:
+            - ~/.m2
+          key: zjq-{{ checksum "pom.xml" }}
+workflows:
+  version: 2
+  default:
+    jobs:
+      - test
