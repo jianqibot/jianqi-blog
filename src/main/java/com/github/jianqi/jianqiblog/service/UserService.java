@@ -2,7 +2,7 @@ package com.github.jianqi.jianqiblog.service;
 
 
 import com.github.jianqi.jianqiblog.entity.User;
-import com.github.jianqi.jianqiblog.mapper.UserMapper;
+import com.github.jianqi.jianqiblog.dao.UserMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

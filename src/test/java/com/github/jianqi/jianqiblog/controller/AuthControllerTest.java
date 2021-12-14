@@ -46,7 +46,7 @@ class AuthControllerTest {
     void returnNotLoginByDefault() throws Exception {
         mvc.perform(get("/auth")).andExpect(status().isOk())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse()
-                        .getContentAsString().contains("\"status\":\"ok\",\"msg\":null,\"user\":null,\"login\":false")));
+                        .getContentAsString().contains("\"login\":false")));
     }
 
     @Test
@@ -61,7 +61,7 @@ class AuthControllerTest {
         // before login
         mvc.perform(get("/auth")).andExpect(status().isOk())
                 .andExpect(result -> Assertions.assertTrue(result.getResponse()
-                        .getContentAsString().contains("\"status\":\"ok\",\"msg\":null,\"user\":null,\"login\":false")));
+                        .getContentAsString().contains("\"login\":false")));
 
         // logging in
         Map<String, String> userInfo = new HashMap<>();

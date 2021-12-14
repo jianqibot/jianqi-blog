@@ -1,4 +1,4 @@
-package com.github.jianqi.jianqiblog.mapper;
+package com.github.jianqi.jianqiblog.dao;
 
 import com.github.jianqi.jianqiblog.entity.User;
 import org.apache.ibatis.annotations.Mapper;

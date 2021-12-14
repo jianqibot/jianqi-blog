@@ -1,6 +1,6 @@
 package com.github.jianqi.jianqiblog.controller;
 
-import com.github.jianqi.jianqiblog.entity.AuthReturn;
+import com.github.jianqi.jianqiblog.entity.LoginResult;
 import com.github.jianqi.jianqiblog.entity.User;
 import com.github.jianqi.jianqiblog.service.UserService;
 import org.springframework.dao.DuplicateKeyException;
@@ -38,19 +38,19 @@ public class AuthController {
 
     @GetMapping("/auth")
     @ResponseBody
-    public AuthReturn auth() {
+    public LoginResult auth() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication == null ? null : authentication.getName();
         if (username == null || username.contains("anonymous")) {
-            return AuthReturn.failureResult("ok", null);
+            return LoginResult.failure("ok", null);
         } else {
-            return AuthReturn.successfulResult("ok", null, userService.getUserByUsername(username));
+            return LoginResult.success("ok", null, userService.getUserByUsername(username), true);
         }
     }
 
     @PostMapping("/auth/login")
     @ResponseBody
-    public AuthReturn login(@RequestBody Map<String, String> loginInfo) {
+    public LoginResult login(@RequestBody Map<String, String> loginInfo) {
         String username = loginInfo.get("username");
         String password = loginInfo.get("password");
         UserDetails userDetails;
@@ -58,7 +58,7 @@ public class AuthController {
         try {
             userDetails = userService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
-            return AuthReturn.failureResult("fail", "wrong username!");
+            return LoginResult.failure("fail", "wrong username!");
         }
 
         UsernamePasswordAuthenticationToken token =
@@ -68,15 +68,15 @@ public class AuthController {
             authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(token);
             User loggedInUser = userService.getUserByUsername(username);
-            return AuthReturn.successfulResult("ok", "successfully logged in!", loggedInUser);
+            return LoginResult.success("ok", "successfully logged in!", loggedInUser, true);
         } catch (BadCredentialsException e) {
-            return AuthReturn.failureResult("fail", "wrong password!");
+            return LoginResult.failure("fail", "wrong password!");
         }
     }
 
     @PostMapping("/auth/register")
     @ResponseBody
-    public AuthReturn register(@RequestBody Map<String, String> registerInfo) {
+    public LoginResult register(@RequestBody Map<String, String> registerInfo) {
         String username = registerInfo.get("username");
         String password = registerInfo.get("password");
 
@@ -85,14 +85,14 @@ public class AuthController {
                 userService.saveUserNameAndPassword(username, password);
             } catch (DuplicateKeyException e) {
                 e.printStackTrace();
-                return AuthReturn.failureResult("fail", "username already exists!");
+                return LoginResult.failure("fail", "username already exists!");
             }
             User registeredUser = userService.getUserByUsername(username);
-            return AuthReturn.successfulResult("ok", "registry is successful", registeredUser);
+            return LoginResult.success("ok", "registry is successful", registeredUser, false);
         } else if (!isValidUsername(username)) {
-            return AuthReturn.failureResult("fail", "invalid username!");
+            return LoginResult.failure("fail", "invalid username!");
         } else if (!isValidPassword(password)) {
-            return AuthReturn.failureResult("fail", "invalid password");
+            return LoginResult.failure("fail", "invalid password");
         }
         return null;
     }
@@ -107,14 +107,14 @@ public class AuthController {
 
     @GetMapping("/auth/logout")
     @ResponseBody
-    public AuthReturn logout() {
+    public LoginResult logout() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User loggedInUser = userService.getUserByUsername(username);
         if (loggedInUser == null) {
-            return AuthReturn.failureResult("fail", "username has not logged in yet!");
+            return LoginResult.failure("fail", "username has not logged in yet!");
         } else {
             SecurityContextHolder.clearContext();
-            return AuthReturn.successfulResult("ok", "successfully logged out!", null);
+            return LoginResult.success("ok", "successfully logged out!", null, false);
         }
     }
 }
