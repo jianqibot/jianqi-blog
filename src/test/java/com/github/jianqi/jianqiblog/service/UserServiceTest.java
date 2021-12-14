@@ -1,7 +1,7 @@
 package com.github.jianqi.jianqiblog.service;
 
 import com.github.jianqi.jianqiblog.entity.User;
-import com.github.jianqi.jianqiblog.mapper.UserMapper;
+import com.github.jianqi.jianqiblog.dao.UserMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

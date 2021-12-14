@@ -102,6 +102,11 @@
             <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.2</version>
+        </dependency>
 
     </dependencies>
 
@@ -223,6 +228,7 @@
                     <url>jdbc:mysql://localhost:3306/blog</url>
                     <user>root</user>
                     <password>my-secret-pw</password>
+                    <target>2</target>
                 </configuration>
                 <executions>
                     <execution>
