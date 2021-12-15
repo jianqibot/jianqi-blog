@@ -4,8 +4,6 @@ import com.github.jianqi.jianqiblog.dao.BlogDao;
 import com.github.jianqi.jianqiblog.entity.Blog;
 import com.github.jianqi.jianqiblog.entity.BlogListResult;
 import com.github.jianqi.jianqiblog.entity.BlogResult;
-import com.github.jianqi.jianqiblog.entity.User;
-
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -14,7 +12,7 @@ import java.util.List;
 @Service
 public class BlogService {
 
-    private BlogDao blogDao;
+    private final BlogDao blogDao;
 
     @Inject
     public BlogService(BlogDao blogDao) {
@@ -42,19 +40,18 @@ public class BlogService {
         } else {
             try {
                 Blog blog = blogDao.getBlogById(blogId);
-                return BlogResult.success("ok", "acquirement successful", null, null, null, blog);
+                return BlogResult.success("ok", "acquirement successful", blog);
             } catch (Exception e) {
                 return BlogResult.failure("fail", "system error");
             }
         }
     }
 
-    public BlogResult postBlog(String title, String content, String description, User loggedInUser) {
-        if (loggedInUser == null) {
-            return BlogResult.failure("fail", "please log in first");
-        } else {
-            Blog blog = blogDao.postBlog(title, content, description, loggedInUser);
-            return BlogResult.success("ok", "blog created successfully", null, null, null, blog);
+    public BlogResult postBlog(Blog newBlog) {
+        try {
+            return BlogResult.success("ok", "blog created successfully", blogDao.postBlog(newBlog));
+        } catch (Exception e) {
+            return BlogResult.failure("fail", e.getMessage());
         }
     }
 }
