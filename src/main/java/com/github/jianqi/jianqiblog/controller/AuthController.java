@@ -2,12 +2,12 @@ package com.github.jianqi.jianqiblog.controller;
 
 import com.github.jianqi.jianqiblog.entity.LoginResult;
 import com.github.jianqi.jianqiblog.entity.User;
+import com.github.jianqi.jianqiblog.service.AuthService;
 import com.github.jianqi.jianqiblog.service.UserService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,23 +29,22 @@ public class AuthController {
     private static final Pattern PATTERN_PASSWORD = Pattern.compile(PASSWORD_PATTERN);
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final AuthService authService;
 
     @Inject
-    public AuthController(UserService userService, AuthenticationManager authenticationManager) {
+    public AuthController(UserService userService, AuthenticationManager authenticationManager, AuthService authService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.authService = authService;
     }
+
 
     @GetMapping("/auth")
     @ResponseBody
     public LoginResult auth() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication == null ? null : authentication.getName();
-        if (username == null || username.contains("anonymous")) {
-            return LoginResult.failure("ok", null);
-        } else {
-            return LoginResult.success("ok", null, userService.getUserByUsername(username), true);
-        }
+        return authService.getLoggedInUser().map(user ->
+                LoginResult.success("ok", null, user, true))
+                .orElse(LoginResult.failure("ok", null));
     }
 
     @PostMapping("/auth/login")
@@ -108,13 +107,13 @@ public class AuthController {
     @GetMapping("/auth/logout")
     @ResponseBody
     public LoginResult logout() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User loggedInUser = userService.getUserByUsername(username);
-        if (loggedInUser == null) {
-            return LoginResult.failure("fail", "username has not logged in yet!");
-        } else {
-            SecurityContextHolder.clearContext();
-            return LoginResult.success("ok", "successfully logged out!", null, false);
-        }
+        LoginResult result = authService.getLoggedInUser()
+                .map(user -> LoginResult.success("ok",
+                        "successfully logged out",
+                        null,
+                        false))
+                .orElse(LoginResult.failure("fail", "username has not logged in yet"));
+        SecurityContextHolder.clearContext();
+        return result;
     }
 }
