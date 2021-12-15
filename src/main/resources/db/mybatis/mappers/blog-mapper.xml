@@ -18,15 +18,15 @@
     </resultMap>
 
     <select id="selectBlog" resultMap="detailedBlogMap">
-        select B.id           as   id,
-               B.title        as   title,
-               B.description  as   description,
-               B.content      as   content,
-               U.id           as   user_id ,
-               U.username     as   username,
-               U.avatar       as   avatar,
-               B.created_at   as   created_at,
-               B.updated_at   as updated_at
+        select B.id as id,
+        B.title as title,
+        B.description as description,
+        B.content as content,
+        U.id as user_id ,
+        U.username as username,
+        U.avatar as avatar,
+        B.created_at as created_at,
+        B.updated_at as updated_at
         from blog B left join user U on B.user_id = U.id
         <if test="user_id != null">
             where U.id = #{user_id}
@@ -39,5 +39,20 @@
             where user_id = #{user_id}
         </if>
     </select>
+    <select id="selectBlogByBlogId" resultMap="detailedBlogMap">
+        select B.id as id,
+        B.title as title,
+        B.description as description,
+        B.content as content,
+        U.id as user_id ,
+        U.username as username,
+        U.avatar as avatar,
+        B.created_at as created_at,
+        B.updated_at as updated_at
+        from blog B left join user U on B.user_id = U.id
+        where B.id = #{blogId}
+    </select>
+
+
 </mapper>
 
