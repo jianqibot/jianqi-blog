@@ -4,6 +4,8 @@ import com.github.jianqi.jianqiblog.dao.BlogDao;
 import com.github.jianqi.jianqiblog.entity.Blog;
 import com.github.jianqi.jianqiblog.entity.BlogListResult;
 import com.github.jianqi.jianqiblog.entity.BlogResult;
+import com.github.jianqi.jianqiblog.entity.User;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,6 +56,7 @@ public class BlogServiceTest {
 
     @Test
     void postBlogReturnFailureWhenNotLoggedIn() {
+
         Blog blog = Mockito.mock(Blog.class);
         when(blogDao.postBlog(blog)).thenThrow(new RuntimeException());
         BlogResult result = blogService.postBlog(blog);

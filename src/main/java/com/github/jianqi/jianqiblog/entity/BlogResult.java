@@ -17,6 +17,5 @@ public class BlogResult extends Result<Blog> {
                                      String msg,
                                      Blog blog) {
         return new BlogResult(status, msg, blog);
-
     }
 }

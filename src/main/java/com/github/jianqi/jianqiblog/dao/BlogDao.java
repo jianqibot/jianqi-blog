@@ -1,6 +1,8 @@
 package com.github.jianqi.jianqiblog.dao;
 
 import com.github.jianqi.jianqiblog.entity.Blog;
+import com.github.jianqi.jianqiblog.entity.User;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,7 @@ public class BlogDao {
 
     public Blog postBlog(Blog newBlog) {
         return new Blog();
+
     }
 
 }

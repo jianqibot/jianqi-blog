@@ -54,5 +54,6 @@
     </select>
     <!--<insert id="insertBlog" parameterMap="detailedBlogMap"-->
 
+
 </mapper>
 

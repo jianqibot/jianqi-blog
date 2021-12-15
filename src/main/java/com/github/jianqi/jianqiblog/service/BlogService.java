@@ -4,6 +4,8 @@ import com.github.jianqi.jianqiblog.dao.BlogDao;
 import com.github.jianqi.jianqiblog.entity.Blog;
 import com.github.jianqi.jianqiblog.entity.BlogListResult;
 import com.github.jianqi.jianqiblog.entity.BlogResult;
+import com.github.jianqi.jianqiblog.entity.User;
+
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
