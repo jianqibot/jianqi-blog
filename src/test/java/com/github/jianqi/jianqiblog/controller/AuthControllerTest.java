@@ -1,6 +1,8 @@
 package com.github.jianqi.jianqiblog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jianqi.jianqiblog.entity.User;
+import com.github.jianqi.jianqiblog.service.AuthService;
 import com.github.jianqi.jianqiblog.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,17 +12,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,12 +36,14 @@ class AuthControllerTest {
     private UserService userService;
     @Mock
     private AuthenticationManager authenticationManager;
+    @Mock
+    private AuthService authService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @BeforeEach
     void SetUp() {
-        mvc = MockMvcBuilders.standaloneSetup(new AuthController(userService, authenticationManager)).build();
+        mvc = MockMvcBuilders.standaloneSetup(new AuthController(userService, authenticationManager, authService)).build();
     }
 
     @Test
@@ -50,18 +54,24 @@ class AuthControllerTest {
     }
 
     @Test
-    void testLoginAndLogout() throws Exception {
+    void returnSuccessAfterLogin() throws Exception {
+        User user = new User(1, "randomUser", encoder.encode("randomPassword"));
+        Mockito.when(authService.getLoggedInUser()).thenReturn(Optional.of(user));
+        mvc.perform(get("/auth")).andExpect(status().isOk())
+                .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("\"login\":true")));
+        System.out.println(user);;
+    }
+
+
+    @Test
+    void registeredUserIsAbleToLogin() throws Exception {
         Mockito.when(userService.loadUserByUsername("randomUser"))
-                .thenReturn(new User("randomUser", encoder.encode("randomPassword"),
+                .thenReturn(new org.springframework.security.core.userdetails.User("randomUser", encoder.encode("randomPassword"),
                         Collections.emptyList()));
 
         Mockito.when(userService.getUserByUsername("randomUser"))
-                .thenReturn(new com.github.jianqi.jianqiblog.entity.User(
+                .thenReturn(new User(
                         1, "randomUser", encoder.encode("randomPassword")));
-        // before login
-        mvc.perform(get("/auth")).andExpect(status().isOk())
-                .andExpect(result -> Assertions.assertTrue(result.getResponse()
-                        .getContentAsString().contains("\"login\":false")));
 
         // logging in
         Map<String, String> userInfo = new HashMap<>();
@@ -74,17 +84,6 @@ class AuthControllerTest {
                 .andExpect(result -> Assertions.assertTrue(result.getResponse()
                         .getContentAsString().contains("\"msg\":\"successfully logged in!\"")))
                 .andReturn();
-
-        // after login
-        HttpSession session = response.getRequest().getSession();
-        mvc.perform(get("/auth").session((MockHttpSession) Objects.requireNonNull(session)))
-                .andExpect(status().isOk())
-                .andExpect(result ->
-                        Assertions.assertTrue(result.getResponse().getContentAsString().contains("randomUser")));
-
-        mvc.perform(get("/auth/logout").session((MockHttpSession) session))
-                .andExpect(status().isOk())
-                .andExpect(result -> Assertions.assertTrue(result.getResponse().getContentAsString().contains("successfully logged out!")));
     }
 
     @Test
@@ -96,7 +95,7 @@ class AuthControllerTest {
         Mockito.doNothing().when(userService).saveUserNameAndPassword("randomUser", "randomPassword");
 
         Mockito.when(userService.getUserByUsername("randomUser"))
-                .thenReturn(new com.github.jianqi.jianqiblog.entity.User(1, "randomUser", "encryptedRandomPassword"));
+                .thenReturn(new User(1, "randomUser", "encryptedRandomPassword"));
 
         mvc.perform(post("/auth/register").contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(userInfo)))
@@ -104,5 +103,21 @@ class AuthControllerTest {
                 .andExpect(result ->
                         Assertions.assertTrue(result.getResponse().getContentAsString()
                                 .contains("\"msg\":\"registry is successful\"")));
+    }
+
+    @Test
+    void logOutReturnFailureByDefault() throws Exception {
+        mvc.perform(get("/auth/logout")).andExpect(status().isOk())
+                .andExpect(result -> Assertions.assertTrue(result.getResponse()
+                        .getContentAsString().contains("\"msg\":\"username has not logged in yet\"")));
+    }
+
+    @Test
+    void logOutReturnSuccessWhenLoggedIn() throws Exception {
+        User user = new User(1, "randomUser", encoder.encode("randomPassword"));
+        Mockito.when(authService.getLoggedInUser()).thenReturn(Optional.of(user));
+        mvc.perform(get("/auth/logout")).andExpect(status().isOk())
+                .andExpect(result -> Assertions.assertTrue(result.getResponse()
+                        .getContentAsString().contains("\"msg\":\"successfully logged out\"")));
     }
 }

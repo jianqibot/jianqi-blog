@@ -37,8 +37,8 @@ public class BlogDao {
     }
 
     public Blog postBlog(Blog newBlog) {
-        return new Blog();
-
+        sqlSession.insert("insertBlog", newBlog);
+        return getBlogById(newBlog.getId());
     }
 
 }
