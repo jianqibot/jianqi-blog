@@ -1,6 +1,8 @@
 package com.github.jianqi.jianqiblog.entity;
 
+
 public class BlogResult extends Result<Blog> {
+
     private Integer total;
     private Integer page;
     private Integer totalPage;
@@ -12,6 +14,7 @@ public class BlogResult extends Result<Blog> {
                        Integer totalPage,
                        Blog blog) {
         super(status, msg, blog);
+
         this.total = total;
         this.page = page;
         this.totalPage = totalPage;
@@ -29,6 +32,7 @@ public class BlogResult extends Result<Blog> {
                                      Integer totalPage,
                                      Blog blog) {
         return new BlogResult(status, msg, total, page, totalPage, blog);
+
     }
 
     public Integer getTotal() {

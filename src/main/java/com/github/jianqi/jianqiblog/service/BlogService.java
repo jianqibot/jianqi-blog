@@ -5,6 +5,7 @@ import com.github.jianqi.jianqiblog.entity.Blog;
 import com.github.jianqi.jianqiblog.entity.BlogListResult;
 import com.github.jianqi.jianqiblog.entity.BlogResult;
 import com.github.jianqi.jianqiblog.entity.User;
+
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -23,6 +24,7 @@ public class BlogService {
     public BlogListResult getBlogs(Integer page,
                                    Integer pageSize,
                                    Integer userId) {
+
         try {
             List<Blog> blogs = blogDao.getBlogs(page, pageSize, userId);
             int count = blogDao.count(userId);
