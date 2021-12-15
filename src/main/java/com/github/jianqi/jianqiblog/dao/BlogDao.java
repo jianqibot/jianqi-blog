@@ -1,6 +1,8 @@
 package com.github.jianqi.jianqiblog.dao;
 
 import com.github.jianqi.jianqiblog.entity.Blog;
+import com.github.jianqi.jianqiblog.entity.User;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +34,12 @@ public class BlogDao {
         return sqlSession.selectOne("countBlog", userId);
     }
 
+    public Blog getBlogById(Integer blogId) {
+        return sqlSession.selectOne("selectBlogByBlogId", blogId);
+    }
+
+    public Blog postBlog(String title, String content, String description, User loggedInUser) {
+        return null;
+    }
 
 }
