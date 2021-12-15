@@ -4,15 +4,12 @@ import com.github.jianqi.jianqiblog.dao.BlogDao;
 import com.github.jianqi.jianqiblog.entity.Blog;
 import com.github.jianqi.jianqiblog.entity.BlogListResult;
 import com.github.jianqi.jianqiblog.entity.BlogResult;
-import com.github.jianqi.jianqiblog.entity.User;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.*;
@@ -57,16 +54,17 @@ public class BlogServiceTest {
 
     @Test
     void postBlogReturnFailureWhenNotLoggedIn() {
-        BlogResult result = blogService.postBlog("title", "content", "description", null);
-        Assertions.assertTrue(result.getMsg().contains("please log in first"));
+        Blog blog = Mockito.mock(Blog.class);
+        when(blogDao.postBlog(blog)).thenThrow(new RuntimeException());
+        BlogResult result = blogService.postBlog(blog);
+        Assertions.assertTrue(result.getStatus().contains("fail"));
     }
 
     @Test
     void postBlogReturnSuccessWhenLoggedIn() {
-        User loggedInUser = Mockito.mock(User.class);
         Blog blog = Mockito.mock(Blog.class);
-        when(blogDao.postBlog("title", "content", "description", loggedInUser)).thenReturn(blog);
-        BlogResult result = blogService.postBlog("title", "content", "description", loggedInUser);
+        when(blogDao.postBlog(blog)).thenReturn(blog);
+        BlogResult result = blogService.postBlog(blog);
         Assertions.assertTrue(result.getMsg().contains("blog created successfully"));
     }
 

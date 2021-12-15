@@ -52,7 +52,7 @@
         from blog B left join user U on B.user_id = U.id
         where B.id = #{blogId}
     </select>
-
+    <!--<insert id="insertBlog" parameterMap="detailedBlogMap"-->
 
 </mapper>
 
