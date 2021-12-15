@@ -4,8 +4,6 @@ import com.github.jianqi.jianqiblog.dao.BlogDao;
 import com.github.jianqi.jianqiblog.entity.Blog;
 import com.github.jianqi.jianqiblog.entity.BlogListResult;
 import com.github.jianqi.jianqiblog.entity.BlogResult;
-import com.github.jianqi.jianqiblog.entity.User;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
