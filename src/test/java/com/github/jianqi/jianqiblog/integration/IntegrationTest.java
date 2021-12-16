@@ -91,7 +91,7 @@ public class IntegrationTest {
 
         Assertions.assertAll("check status and content of logging out",
                 () -> Assertions.assertEquals(200, responseToLogout.statusCode()),
-                () -> Assertions.assertTrue(responseToLogout.body().contains("successfully logged out!")));
+                () -> Assertions.assertTrue(responseToLogout.body().contains("successfully logged out")));
 
 
         HttpRequest requestCheckIfLoggedOut = HttpRequest.newBuilder()
