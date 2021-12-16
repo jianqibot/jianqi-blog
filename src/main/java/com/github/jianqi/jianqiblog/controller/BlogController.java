@@ -86,6 +86,7 @@ public class BlogController {
             description = content.substring(0, Math.min(20, content.length()));
         }
 
+
         Blog formedBlog = new Blog();
         formedBlog.setTitle(title);
         formedBlog.setContent(content);

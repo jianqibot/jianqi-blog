@@ -74,5 +74,6 @@
         delete from blog where id = #{blogId}
     </delete>
 
+
 </mapper>
 
