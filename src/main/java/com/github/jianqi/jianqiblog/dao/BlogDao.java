@@ -41,4 +41,12 @@ public class BlogDao {
         return getBlogById(newBlog.getId());
     }
 
+    public Blog updateBlog(Blog updateBlog) {
+        sqlSession.update("updateBlog", updateBlog);
+        return getBlogById(updateBlog.getId());
+    }
+
+    public void deleteBlog(Integer blogId) {
+        sqlSession.delete("deleteBlog", blogId);
+    }
 }
