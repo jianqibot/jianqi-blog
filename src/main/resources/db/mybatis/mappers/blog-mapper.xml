@@ -56,7 +56,23 @@
         insert into blog(user_id, title, description, content, created_at, updated_at)
         values(#{userId}, #{title}, #{description}, #{content}, now(), now())
     </insert>
-
+    <update id="updateBlog" parameterType="Blog">
+        update blog
+        set
+        <if test="title != null">
+            title = #{title},
+        </if>
+        <if test="content != null">
+            content = #{content},
+        </if>
+        <if test="description != null">
+            description = #{description}
+        </if>
+        where id = #{id}
+    </update>
+    <delete id="deleteBlog" parameterType="int">
+        delete from blog where id = #{blogId}
+    </delete>
 
 
 </mapper>

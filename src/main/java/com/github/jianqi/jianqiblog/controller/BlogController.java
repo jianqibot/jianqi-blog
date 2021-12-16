@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 @Controller
 public class BlogController {
@@ -40,27 +41,52 @@ public class BlogController {
 
     @PostMapping("/blog")
     @ResponseBody
-    public BlogResult postBlog(@RequestParam("title") String title,
-                               @RequestParam("description") String description,
-                               @RequestParam("content") String content) {
+    public BlogResult postBlog(@RequestBody Map<String, String> params) {
 
-        if (title == null || title.isBlank() || title.length() > 100) {
-            return BlogResult.failure("fail", "invalid title");
-        } else if (content == null || content.isBlank() || content.length() > 10000) {
-            return BlogResult.failure("fail", "invalid content");
+        try {
+            return authService.getLoggedInUser()
+                    .map(user -> blogService.postBlog(formBlogFromParams(params, user)))
+                    .orElse(BlogResult.failure("fail", "log in first"));
+        } catch (IllegalArgumentException e) {
+            return BlogResult.failure("fail", e.getMessage());
         }
+    }
 
-        if (description == null || description.isBlank()) {
-            description = content.substring(0, Math.min(20, content.length()));
-        }
+    @PatchMapping("/blog/{blogId}")
+    @ResponseBody
+    public BlogResult postBlog(@PathVariable("blogId") Integer blogId,
+                               @RequestBody Map<String, String> params) {
 
-        String finalDescription = description;
         return authService.getLoggedInUser()
-                .map(user -> blogService.postBlog(formBlogFromParams(title, finalDescription, content, user)))
+                .map(user -> blogService.updateBlog(blogId, formBlogFromParams(params, user)))
                 .orElse(BlogResult.failure("fail", "log in first"));
     }
 
-    private Blog formBlogFromParams(String title, String description, String content, User user) {
+    @DeleteMapping("/blog/{blogId}")
+    @ResponseBody
+    public BlogResult deleteBlog(@PathVariable("blogId") Integer blogId) {
+
+        return authService.getLoggedInUser()
+                .map(user -> blogService.deleteBlog(blogId, user.getId()))
+                .orElse(BlogResult.failure("fail", "log in first"));
+    }
+
+    private Blog formBlogFromParams(Map<String, String> params, User user) {
+        String title = params.get("title");
+        String content = params.get("content");
+        String description = params.get("description");
+
+        if (title.isBlank() || title.length() > 100) {
+            throw new IllegalArgumentException("invalid title");
+        } else if (content.isBlank() || content.length() > 10000) {
+            throw new IllegalArgumentException("invalid content");
+        }
+
+        if (description.isBlank()) {
+            description = content.substring(0, Math.min(20, content.length()));
+        }
+
+
         Blog formedBlog = new Blog();
         formedBlog.setTitle(title);
         formedBlog.setContent(content);

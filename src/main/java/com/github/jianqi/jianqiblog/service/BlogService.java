@@ -54,4 +54,28 @@ public class BlogService {
             return BlogResult.failure("fail", e.getMessage());
         }
     }
+
+    public BlogResult updateBlog(Integer blogId, Blog updateBlog) {
+        Blog targetBlog = blogDao.getBlogById(blogId);
+        if (targetBlog == null) {
+            return BlogResult.failure("fail", "blog does not exist");
+        }
+        if (!targetBlog.getUser().getId().equals(updateBlog.getUserId())) {
+            return BlogResult.failure("fail", "access denied");
+        }
+        updateBlog.setId(blogId);
+        return BlogResult.success("ok", "blog modified successfully", blogDao.updateBlog(updateBlog));
+    }
+
+    public BlogResult deleteBlog(Integer blogId, Integer userId) {
+        Blog targetBlog = blogDao.getBlogById(blogId);
+        if (targetBlog == null) {
+            return BlogResult.failure("fail", "blog does not exist");
+        }
+        if (!targetBlog.getUser().getId().equals(userId)) {
+            return BlogResult.failure("fail", "access denied");
+        }
+        blogDao.deleteBlog(blogId);
+        return BlogResult.success("ok", "blog deleted successfully", null);
+    }
 }
