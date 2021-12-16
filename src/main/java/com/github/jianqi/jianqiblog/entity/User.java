@@ -22,6 +22,9 @@ public class User {
         this.updatedAt = Instant.now();
     }
 
+    public User() {
+    }
+
     public Integer getId() {
         return id;
     }
