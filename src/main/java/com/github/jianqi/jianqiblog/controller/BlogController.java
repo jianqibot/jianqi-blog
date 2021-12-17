@@ -73,10 +73,7 @@ public class BlogController {
     }
 
     private Blog formBlogFromParams(Map<String, String> params, User user) {
-<<<<<<< HEAD
-=======
 
->>>>>>> bd31972339ba35c0fe5c069f5fe6eb7a36c9016b
         String title = params.get("title");
         String content = params.get("content");
         String description = params.get("description");
