@@ -30,20 +30,21 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 public class IntegrationTest {
     @Inject
     private Environment environment;
-    private final HttpClient client = HttpClient.newBuilder()
-            .cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL)).build();
+    private final HttpClient client;
     private String port;
+    private final Map<String, String> userInfo;
 
-    private Map<String, String> getUserInfo() {
-        Map<String, String> userInfo = new HashMap<>();
-        userInfo.put("username", "randomUser");
-        userInfo.put("password", "randomPassword");
-        return userInfo;
+    public IntegrationTest(){
+        client = HttpClient.newBuilder()
+                .cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL)).build();
+        userInfo = new HashMap<>();
     }
 
     @BeforeAll
     void setup() {
         port = environment.getProperty("local.server.port");
+        userInfo.put("username", "randomUser");
+        userInfo.put("password", "randomPassword");
     }
 
     @Test
@@ -67,7 +68,7 @@ public class IntegrationTest {
         HttpRequest requestToRegister = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/auth/register"))
                 .headers("Content-Type", "application/json;charset=UTF-8")
-                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(getUserInfo())))
+                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(userInfo)))
                 .build();
 
         HttpResponse<String> responseToRegister = client.send(requestToRegister, HttpResponse.BodyHandlers.ofString());
@@ -83,7 +84,7 @@ public class IntegrationTest {
         HttpRequest requestToLogin = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/auth/login"))
                 .headers("Content-Type", "application/json;charset=UTF-8")
-                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(getUserInfo())))
+                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(userInfo)))
                 .build();
 
         HttpResponse<String> responseToLogin = client.send(requestToLogin, HttpResponse.BodyHandlers.ofString());
