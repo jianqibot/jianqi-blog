@@ -68,7 +68,7 @@ public class IntegrationTest {
         HttpRequest requestToRegister = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/auth/register"))
                 .headers("Content-Type", "application/json;charset=UTF-8")
-                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(getUserInfo())))
+                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(userInfo)))
                 .build();
 
         HttpResponse<String> responseToRegister = client.send(requestToRegister, HttpResponse.BodyHandlers.ofString());
@@ -84,7 +84,7 @@ public class IntegrationTest {
         HttpRequest requestToLogin = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/auth/login"))
                 .headers("Content-Type", "application/json;charset=UTF-8")
-                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(getUserInfo())))
+                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(userInfo)))
                 .build();
 
         HttpResponse<String> responseToLogin = client.send(requestToLogin, HttpResponse.BodyHandlers.ofString());
