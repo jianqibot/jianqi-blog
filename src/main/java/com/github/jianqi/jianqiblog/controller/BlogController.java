@@ -73,7 +73,7 @@ public class BlogController {
                 .orElse(BlogResult.failure("fail", "log in first"));
     }
 
-    public Blog formBlogFromParams(Map<String, String> params, User user) {
+    private Blog formBlogFromParams(Map<String, String> params, User user) {
         String title = params.get("title");
         String content = params.get("content");
         String description = params.get("description");
@@ -87,7 +87,6 @@ public class BlogController {
         if (description.isBlank()) {
             description = content.substring(0, Math.min(20, content.length()));
         }
-
 
         Blog formedBlog = new Blog();
         formedBlog.setTitle(title);
