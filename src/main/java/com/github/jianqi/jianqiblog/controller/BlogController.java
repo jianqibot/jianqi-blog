@@ -25,8 +25,8 @@ public class BlogController {
 
     @GetMapping("/blog")
     @ResponseBody
-    public BlogListResult getBlog(@RequestParam("page") Integer page,
-                                  @RequestParam(value = "userId", required = false) Integer userId) {
+    public BlogListResult getBlogs(@RequestParam("page") Integer page,
+                                   @RequestParam(value = "userId", required = false) Integer userId) {
         if (page == null || page < 0) {
             page = 1;
         }
@@ -35,7 +35,7 @@ public class BlogController {
 
     @GetMapping("/blog/{blogId}")
     @ResponseBody
-    public BlogResult blogId(@PathVariable("blogId") Integer blogId) {
+    public BlogResult getBlogById(@PathVariable("blogId") Integer blogId) {
         return blogService.getBlogById(blogId);
     }
 
@@ -43,13 +43,14 @@ public class BlogController {
     @ResponseBody
     public BlogResult postBlog(@RequestBody Map<String, String> params) {
 
-        try {
-            return authService.getLoggedInUser()
-                    .map(user -> blogService.postBlog(formBlogFromParams(params, user)))
-                    .orElse(BlogResult.failure("fail", "log in first"));
-        } catch (IllegalArgumentException e) {
-            return BlogResult.failure("fail", e.getMessage());
-        }
+        return authService.getLoggedInUser()
+                .map(user -> blogService.postBlog(formBlogFromParams(params, user)))
+                .orElse(BlogResult.failure("fail", "log in first"));
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    public BlogResult handleIllegalArgumentException(IllegalArgumentException e) {
+        return BlogResult.failure("fail", e.getMessage());
     }
 
     @PatchMapping("/blog/{blogId}")
@@ -72,6 +73,7 @@ public class BlogController {
     }
 
     private Blog formBlogFromParams(Map<String, String> params, User user) {
+
         String title = params.get("title");
         String content = params.get("content");
         String description = params.get("description");
@@ -85,7 +87,6 @@ public class BlogController {
         if (description.isBlank()) {
             description = content.substring(0, Math.min(20, content.length()));
         }
-
 
         Blog formedBlog = new Blog();
         formedBlog.setTitle(title);
