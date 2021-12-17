@@ -79,7 +79,9 @@ public class BlogServiceTest {
     }
 
     @Test
+
     void updateBlogReturnSuccessWhenInGoodCondition() {
+
         Blog blogFromDB = new Blog();
         User user = new User();
         Blog blogToUpdate = new Blog();
