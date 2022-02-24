@@ -1,0 +1,41 @@
+version: '2.1'
+
+services:
+
+  docker-mysql:
+    container_name: my-mysql
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+      - MYSQL_DATABASE=blog
+    ports:
+      - 3306:3306
+
+  app:
+    container_name: my-app
+    image: blog:latest
+    ports:
+       - 8080:8080
+    environment:
+       SPRING_DATASOURCE_URL: jdbc:mysql://docker-mysql:3306/blog?allowPublicKeyRetrieval=true&useSSL=false
+       SPRING_DATASOURCE_USERNAME: root
+       SPRING_DATASOURCE_PASSWORD: my-secret-pw
+    depends_on:
+       - docker-mysql
+    links:
+       - docker-mysql:docker-mysql
+
+
+  flyway:
+     container_name: my-flyway
+     environment:
+        - FLYWAY_USER=root
+        - FLYWAY_PASSWORD=my-secret-pw
+        - FLYWAY_URL=jdbc:mysql://docker-mysql:3306/blog?allowPublicKeyRetrieval=true&useSSL=false
+        - FLYWAY_TARGET=2
+     image: flyway/flyway:latest
+     command: -locations=filesystem:/flyway/sql -connectRetries=10 migrate
+     volumes:
+        - ./src/main/resources/db/migration/:/flyway/sql
+     depends_on:
+        - docker-mysql

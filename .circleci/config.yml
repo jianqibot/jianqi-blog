@@ -1,23 +1,40 @@
 version: 2
 jobs:
-  test:
+  build:
     docker:
       - image: cimg/openjdk:11.0
+        environment:
+          DB_ROOT_USER: root
+          DB_DRIVER: com.mysql.cj.jdbc.Driver
+          DB_PASS: my-secret-pw
+          TEST_DB_URL: jdbc:mysql://localhost:3307/blog-test
+      - image: cimg/mysql:8.0
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: ''
+          MYSQL_DATABASE: blog-test
+          MYSQL_USER: root
+          MYSQL_PASSWORD: my-secret-pw
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 19.03.13
+      - run:
+          name: Wait for database service on the tcp protocol
+          command: dockerize -wait tcp://localhost:3307 -timeout 1m
+
+      #- setup_remote_docker:
+      #    version: 19.03.13
       - restore_cache:
           key: zjq-{{ checksum "pom.xml" }}
       - run:
           name: Run Maven Test
-          command: mvn test -PmavenCentral
+          command: mvn clean verify -PmavenCentral
       - save_cache: # saves the project dependencies
           paths:
             - ~/.m2
           key: zjq-{{ checksum "pom.xml" }}
+
 workflows:
   version: 2
   default:
     jobs:
-      - test
+      - build
