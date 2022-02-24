@@ -13,30 +13,23 @@ jobs:
           #MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_ROOT_PASSWORD: my-secret-pw
           MYSQL_DATABASE: blog-test
-          MYSQL_USER: tester
+          MYSQL_USER: user
           MYSQL_PASSWORD: passw0rd
     steps:
       - checkout
       - run:
-          name: Waiting for MySQL to be ready
-          command: |
-            for i in `seq 1 10`;
-            do
-              nc -z 127.0.0.1 3306 && echo Success && exit 0
-              echo -n .
-              sleep 1
-            done
-            echo Failed waiting for MySQL && exit 1
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
 
       - run:
           name: Install MySQL CLI; Import dummy data; run an example query
           command: |
             sudo apt-get update
             sudo apt-get install mysql-client
-            mysql -h 127.0.0.1 --user=tester --passw0rd  blog_test < src//main/resources/db/migration/V1__Create_User_Table.sql
-            mysql -h 127.0.0.1 --user=tester --passw0rd blog_test < src//main/resources/db/migration/V2__Create_Blog_Table.sql
-            mysql -h 127.0.0.1 --user=tester --passw0rd blog_test < src//main/resources/db/migration/V3__Add_Dummy_Data_To_User_And_Blog_DB.sql
-            mysql -h 127.0.0.1 --user=tester --passw0rd --execute="SELECT * FROM blog_test.user"
+            mysql -h 127.0.0.1 -u user -ppassw0rd  blog_test < src//main/resources/db/migration/V1__Create_User_Table.sql
+            mysql -h 127.0.0.1 -u user -ppassw0rd  blog_test < src//main/resources/db/migration/V2__Create_Blog_Table.sql
+            mysql -h 127.0.0.1 -u user -ppassw0rd  blog_test < src//main/resources/db/migration/V3__Add_Dummy_Data_To_User_And_Blog_DB.sql
+            mysql -h 127.0.0.1 -u user -ppassw0rd  --execute="SELECT * FROM blog_test.user"
 
 
       #- restore_cache:
