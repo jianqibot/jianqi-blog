@@ -13,25 +13,40 @@ jobs:
           #MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_ROOT_PASSWORD: my-secret-pw
           MYSQL_DATABASE: blog-test
-          #MYSQL_USER: root
-          #MYSQL_PASSWORD: my-secret-pw
+          MYSQL_USER: user
+          MYSQL_PASSWORD: passw0rd
     steps:
       - checkout
       - run:
-          name: Wait for database service on the tcp protocol
-          command: dockerize -wait tcp://localhost:3306 -timeout 1m
+          name: Waiting for MySQL to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL && exit 1
 
-      #- setup_remote_docker:
-      #    version: 19.03.13
-      - restore_cache:
-          key: zjq-{{ checksum "pom.xml" }}
+      - run:
+          name: Install MySQL CLI; Import dummy data; run an example query
+          command: |
+            sudo apt-get install default-mysql-client
+            mysql -h 127.0.0.1 -u user -ppassw0rd blog_test < src//main/resources/db/migration/V1__Create_User_Table.sql
+            mysql -h 127.0.0.1 -u user -ppassw0rd blog_test < src//main/resources/db/migration/V2__Create_Blog_Table.sql
+            mysql -h 127.0.0.1 -u user -ppassw0rd blog_test < src//main/resources/db/migration/V3__Add_Dummy_Data_To_User_And_Blog_DB.sql
+            mysql -h 127.0.0.1 -u user -ppassw0rd --execute="SELECT * FROM blog_test.user"
+
+
+      #- restore_cache:
+      #    key: zjq-{{ checksum "pom.xml" }}
       - run:
           name: Run Maven Test
-          command: mvn clean verify -PmavenCentral
-      - save_cache: # saves the project dependencies
-          paths:
-            - ~/.m2
-          key: zjq-{{ checksum "pom.xml" }}
+          command: mvn clean verify #-PmavenCentral
+      #- save_cache: # saves the project dependencies
+      #    paths:
+      #      - ~/.m2
+      #    key: zjq-{{ checksum "pom.xml" }}
 
 workflows:
   version: 2
