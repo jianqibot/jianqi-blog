@@ -8,7 +8,7 @@ jobs:
           DB_DRIVER: com.mysql.cj.jdbc.Driver
           DB_PASS: my-secret-pw
           TEST_DB_URL: jdbc:mysql://localhost:3306/blog-test
-      - image: cimg/mysql:8.0
+      - image: circleci/mysql:5.7
         environment:
           #MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_ROOT_PASSWORD: my-secret-pw
