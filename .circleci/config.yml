@@ -10,11 +10,11 @@ jobs:
           TEST_DB_URL: jdbc:mysql://localhost:3307/blog-test
       - image: cimg/mysql:8.0
         environment:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_ROOT_PASSWORD: ''
+          #MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: my-secret-pw
           MYSQL_DATABASE: blog-test
-          MYSQL_USER: root
-          MYSQL_PASSWORD: my-secret-pw
+          #MYSQL_USER: root
+          #MYSQL_PASSWORD: my-secret-pw
     steps:
       - checkout
       - run:
