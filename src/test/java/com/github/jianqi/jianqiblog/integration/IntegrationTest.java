@@ -46,7 +46,6 @@ public class IntegrationTest {
     @Value("${spring.datasource.password}")
     private String databasePassword;
 
-
     public IntegrationTest() {
         client = HttpClient.newBuilder()
                 .cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL)).build();
