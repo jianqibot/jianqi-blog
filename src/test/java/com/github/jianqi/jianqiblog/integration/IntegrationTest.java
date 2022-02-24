@@ -60,9 +60,9 @@ public class IntegrationTest {
         // flyway:clean && flyway:migrate
         ClassicConfiguration conf = new ClassicConfiguration();
         conf.setDataSource(databaseUrl, databaseUsername, databasePassword);
-/*        Flyway.configure()
+        Flyway.configure()
                 .baselineOnMigrate(true)
-                .load();*/
+                .load();
         Flyway flyway = new Flyway(conf);
         flyway.clean();
         flyway.migrate();
