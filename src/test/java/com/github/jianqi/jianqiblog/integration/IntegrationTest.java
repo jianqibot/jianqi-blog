@@ -2,6 +2,8 @@ package com.github.jianqi.jianqiblog.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jianqi.jianqiblog.JianqiBlogApplication;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.ClassicConfiguration;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,8 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.configuration.ClassicConfiguration;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -60,6 +60,9 @@ public class IntegrationTest {
         // flyway:clean && flyway:migrate
         ClassicConfiguration conf = new ClassicConfiguration();
         conf.setDataSource(databaseUrl, databaseUsername, databasePassword);
+/*        Flyway.configure()
+                .baselineOnMigrate(true)
+                .load();*/
         Flyway flyway = new Flyway(conf);
         flyway.clean();
         flyway.migrate();

@@ -1,5 +1,6 @@
 package com.github.jianqi.jianqiblog;
 
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,5 +17,9 @@ class JianqiBlogApplicationTests {
 
     @Test
     void contextLoads() {
+        Flyway.configure()
+                .baselineOnMigrate(true)
+                .load();
+
     }
 }
