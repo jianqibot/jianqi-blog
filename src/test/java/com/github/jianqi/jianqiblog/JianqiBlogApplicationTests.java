@@ -1,7 +1,5 @@
 package com.github.jianqi.jianqiblog;
 
-import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -15,11 +13,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @TestPropertySource(properties = {"spring.config.location=classpath:test.properties"})
 class JianqiBlogApplicationTests {
 
-    @Test
+/*    @Test
     void contextLoads() {
         Flyway.configure()
                 .baselineOnMigrate(true)
                 .load();
 
-    }
+    }*/
 }
