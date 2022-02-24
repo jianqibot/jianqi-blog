@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jianqi.jianqiblog.JianqiBlogApplication;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.ClassicConfiguration;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -24,7 +27,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = JianqiBlogApplication.class, webEnvironment = RANDOM_PORT)
-@TestPropertySource(locations = "classpath:test.properties")
+@TestPropertySource(properties = {"spring.config.location=classpath:test.properties"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class IntegrationTest {
@@ -35,6 +38,13 @@ public class IntegrationTest {
     private final Map<String, String> userInfo;
     private final Map<String, String> blogInfo;
     private final Map<String, String> blogInfoForUpdate;
+
+    @Value("${spring.datasource.url}")
+    private String databaseUrl;
+    @Value("${spring.datasource.username}")
+    private String databaseUsername;
+    @Value("${spring.datasource.password}")
+    private String databasePassword;
 
 
     public IntegrationTest() {
@@ -47,6 +57,13 @@ public class IntegrationTest {
 
     @BeforeAll
     void setup() {
+        // flyway:clean && flyway:migrate
+        ClassicConfiguration conf = new ClassicConfiguration();
+        conf.setDataSource(databaseUrl, databaseUsername, databasePassword);
+        Flyway flyway = new Flyway(conf);
+        flyway.clean();
+        flyway.migrate();
+
         port = environment.getProperty("local.server.port");
         userInfo.put("username", "randomUser");
         userInfo.put("password", "randomPassword");
@@ -172,7 +189,7 @@ public class IntegrationTest {
     void loggedInUserIsAbleToUpdateHisBlogs() throws IOException, InterruptedException {
 
         HttpRequest requestToUpdateExistingBlog = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/blog/1"))
+                .uri(URI.create("http://localhost:" + port + "/blog/7"))
                 .headers("Content-Type", "application/json;charset=UTF-8")
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(blogInfoForUpdate)))
                 .build();
@@ -189,7 +206,7 @@ public class IntegrationTest {
     void loggedInUserIsAbleToDeleteHisBlogs() throws IOException, InterruptedException {
 
         HttpRequest requestToDeleteExistingBlog = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/blog/1"))
+                .uri(URI.create("http://localhost:" + port + "/blog/7"))
                 .DELETE()
                 .build();
         HttpResponse<String> responseFromDeleteBlog = client.send(requestToDeleteExistingBlog, HttpResponse.BodyHandlers.ofString());
