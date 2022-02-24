@@ -27,10 +27,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install mysql-client
             mysql -h 127.0.0.1 -u root -pROOT --execute="CREATE DATABASE blogTest"
-            mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V1__Create_User_Table.sql
-            mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V2__Create_Blog_Table.sql
-            mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V3__Add_Dummy_Data_To_User_And_Blog_DB.sql
-            mysql -h 127.0.0.1 -u root -pROOT  --execute="SELECT * FROM blogTest.user"
+
 
 
       #- restore_cache:
@@ -48,3 +45,9 @@ workflows:
   default:
     jobs:
       - build
+
+
+        #mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V1__Create_User_Table.sql
+        #mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V2__Create_Blog_Table.sql
+        #mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V3__Add_Dummy_Data_To_User_And_Blog_DB.sql
+        #mysql -h 127.0.0.1 -u root -pROOT  --execute="SELECT * FROM blogTest.user"
