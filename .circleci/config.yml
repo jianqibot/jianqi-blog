@@ -11,10 +11,10 @@ jobs:
       - image: cimg/mysql:8.0
         environment:
           #MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_ROOT_PASSWORD: my-secret-pw
+          MYSQL_ROOT_PASSWORD: &rootPw ROOT
           MYSQL_DATABASE: blog-test
-          MYSQL_USER: user
-          MYSQL_PASSWORD: passw0rd
+          #MYSQL_USER: user
+          #MYSQL_PASSWORD: passw0rd
     steps:
       - checkout
       - run:
@@ -26,10 +26,11 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get install mysql-client
-            mysql -h 127.0.0.1 -u user -ppassw0rd  blog_test < src//main/resources/db/migration/V1__Create_User_Table.sql
-            mysql -h 127.0.0.1 -u user -ppassw0rd  blog_test < src//main/resources/db/migration/V2__Create_Blog_Table.sql
-            mysql -h 127.0.0.1 -u user -ppassw0rd  blog_test < src//main/resources/db/migration/V3__Add_Dummy_Data_To_User_And_Blog_DB.sql
-            mysql -h 127.0.0.1 -u user -ppassw0rd  --execute="SELECT * FROM blog_test.user"
+            mysql -h 127.0.0.1 -u root -pROOT --execute="CREATE DATABASE blogTest"
+            mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V1__Create_User_Table.sql
+            mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V2__Create_Blog_Table.sql
+            mysql -h 127.0.0.1 -u root -pROOT  blogTest < src//main/resources/db/migration/V3__Add_Dummy_Data_To_User_And_Blog_DB.sql
+            mysql -h 127.0.0.1 -u root -pROOT  --execute="SELECT * FROM blogTest.user"
 
 
       #- restore_cache:
