@@ -8,7 +8,7 @@ jobs:
           DB_DRIVER: com.mysql.cj.jdbc.Driver
           DB_PASS: my-secret-pw
           TEST_DB_URL: jdbc:mysql://localhost:3306/blog-test
-      - image: cimg/mysql:5.7
+      - image: cimg/mysql:8.0
         environment:
           #MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_ROOT_PASSWORD: my-secret-pw
@@ -31,6 +31,7 @@ jobs:
       - run:
           name: Install MySQL CLI; Import dummy data; run an example query
           command: |
+            sudo apt-get install mysql-client
             mysql -h 127.0.0.1 -u user -ppassw0rd blog_test < src//main/resources/db/migration/V1__Create_User_Table.sql
             mysql -h 127.0.0.1 -u user -ppassw0rd blog_test < src//main/resources/db/migration/V2__Create_Blog_Table.sql
             mysql -h 127.0.0.1 -u user -ppassw0rd blog_test < src//main/resources/db/migration/V3__Add_Dummy_Data_To_User_And_Blog_DB.sql
