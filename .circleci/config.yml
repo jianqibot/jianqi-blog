@@ -7,7 +7,7 @@ jobs:
           DB_ROOT_USER: root
           DB_DRIVER: com.mysql.cj.jdbc.Driver
           DB_PASS: my-secret-pw
-          TEST_DB_URL: jdbc:mysql://localhost:3307/blog-test
+          TEST_DB_URL: jdbc:mysql://localhost:3306/blog-test
       - image: cimg/mysql:8.0
         environment:
           #MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -19,7 +19,7 @@ jobs:
       - checkout
       - run:
           name: Wait for database service on the tcp protocol
-          command: dockerize -wait tcp://localhost:3307 -timeout 1m
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
 
       #- setup_remote_docker:
       #    version: 19.03.13
