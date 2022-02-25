@@ -44,7 +44,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -107,6 +106,18 @@
             <artifactId>mybatis</artifactId>
             <version>3.5.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>8.4.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>8.4.4</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
@@ -159,92 +170,7 @@
                     </includes>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <id>start-test-db</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <longModulepath>false</longModulepath>
-                            <executable>docker</executable>
-                            <arguments>
-                                <argument>run</argument>
-                                <argument>--name</argument>
-                                <argument>mysql-test</argument>
-                                <argument>-e</argument>
-                                <argument>MYSQL_ROOT_PASSWORD=my-secret-pw</argument>
-                                <argument>-e</argument>
-                                <argument>MYSQL_DATABASE=blog-test</argument>
-                                <argument>-p</argument>
-                                <argument>3307:3306</argument>
-                                <argument>-d</argument>
-                                <argument>mysql:8.0</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>wait-test-db-show-up</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <longModulepath>false</longModulepath>
-                            <executable>sleep</executable>
-                            <arguments>
-                                <argument>25</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>teardown-test-db</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <longModulepath>false</longModulepath>
-                            <executable>docker</executable>
-                            <arguments>
-                                <argument>rm</argument>
-                                <argument>-f</argument>
-                                <argument>mysql-test</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>8.2.0</version>
-                <configuration>
-                    <url>jdbc:mysql://localhost:3306/blog</url>
-                    <user>root</user>
-                    <password>my-secret-pw</password>
-                    <target>2</target>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>setup-test-db</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>migrate</goal>
-                        </goals>
-                        <configuration>
-                            <url>jdbc:mysql://localhost:3307/blog-test</url>
-                            <user>root</user>
-                            <password>my-secret-pw</password>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><configuration><source>11</source><target>11</target></configuration></plugin>
+            <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><configuration><source>11</source><target>11</target></configuration></plugin>
         </plugins>
     </build>
 

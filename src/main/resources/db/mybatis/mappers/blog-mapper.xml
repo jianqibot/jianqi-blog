@@ -52,10 +52,12 @@
         from blog B left join user U on B.user_id = U.id
         where B.id = #{blogId}
     </select>
+
     <insert id="insertBlog" parameterType="Blog" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         insert into blog(user_id, title, description, content, created_at, updated_at)
         values(#{userId}, #{title}, #{description}, #{content}, now(), now())
     </insert>
+
     <update id="updateBlog" parameterType="Blog">
         update blog
         set

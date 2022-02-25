@@ -31,17 +31,12 @@ public class UserService implements UserDetailsService {
         return userMapper.findUserByUsername(username);
     }
 
-    public String getUserPassword(String username) {
-        return getUserByUsername(username).getEncryptedPassword();
-    }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userMapper.findUserByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("Can not find username: " + username);
         }
-        String password = getUserPassword(username);
-        return new org.springframework.security.core.userdetails.User(username, password, Collections.emptyList());
+        return new org.springframework.security.core.userdetails.User(username, user.getEncryptedPassword(), Collections.emptyList());
     }
 }
