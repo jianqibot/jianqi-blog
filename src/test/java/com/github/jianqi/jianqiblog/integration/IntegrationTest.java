@@ -1,6 +1,5 @@
 package com.github.jianqi.jianqiblog.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jianqi.jianqiblog.JianqiBlogApplication;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.ClassicConfiguration;
@@ -16,7 +15,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -33,8 +31,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 public class IntegrationTest {
     @Inject
     private Environment environment;
-    private final HttpClient client;
     private String port;
+    private final HttpRequestBuilder httpRequestBuilder = new DefaultHttpRequestBuilder();
+    private final HttpClient client;
     private final Map<String, String> userInfo;
     private final Map<String, String> blogInfo;
     private final Map<String, String> blogInfoForUpdate;
@@ -78,8 +77,7 @@ public class IntegrationTest {
     @Order(1)
     void returnFailureWhenNotLoggedIn() throws IOException, InterruptedException {
 
-        HttpRequest requestBeforeLoggedIn = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/auth")).GET().build();
+        HttpRequest requestBeforeLoggedIn = httpRequestBuilder.buildRequest(port, "/auth", "get", null);
         HttpResponse<String> responseBeforeLoggedIn = client.send(requestBeforeLoggedIn, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content before logging in",
@@ -92,15 +90,10 @@ public class IntegrationTest {
     @Order(2)
     void newUserIsAbleToRegister() throws IOException, InterruptedException {
 
-        HttpRequest requestToRegister = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/auth/register"))
-                .headers("Content-Type", "application/json;charset=UTF-8")
-                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(userInfo)))
-                .build();
-
+        HttpRequest requestToRegister = httpRequestBuilder.buildRequest(port, "/auth/register", "post", userInfo);
         HttpResponse<String> responseToRegister = client.send(requestToRegister, HttpResponse.BodyHandlers.ofString());
 
-        Assertions.assertAll("check status and content of registery",
+        Assertions.assertAll("check status and content of registry",
                 () -> Assertions.assertEquals(200, responseToRegister.statusCode()),
                 () -> Assertions.assertTrue(responseToRegister.body().contains("registry is successful")));
     }
@@ -108,12 +101,7 @@ public class IntegrationTest {
     @Test
     @Order(3)
     void registeredUserIsAbleToLogin() throws IOException, InterruptedException {
-        HttpRequest requestToLogin = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/auth/login"))
-                .headers("Content-Type", "application/json;charset=UTF-8")
-                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(userInfo)))
-                .build();
-
+        HttpRequest requestToLogin = httpRequestBuilder.buildRequest(port, "/auth/login", "post", userInfo);
         HttpResponse<String> responseToLogin = client.send(requestToLogin, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content of logging in",
@@ -124,8 +112,7 @@ public class IntegrationTest {
     @Test
     @Order(4)
     void returnSuccessWhenLoggedIn() throws IOException, InterruptedException {
-        HttpRequest requestCheckIfLoggedIn = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/auth")).GET().build();
+        HttpRequest requestCheckIfLoggedIn = httpRequestBuilder.buildRequest(port, "/auth", "get", null);
         HttpResponse<String> responseCheckIfLoggedIn = client.send(requestCheckIfLoggedIn, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content after logging in",
@@ -138,11 +125,7 @@ public class IntegrationTest {
     @Order(5)
     void loggedInUserIsAbleToCreateBlog() throws IOException, InterruptedException {
 
-        HttpRequest requestToCreateNewBlog = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/blog"))
-                .headers("Content-Type", "application/json;charset=UTF-8")
-                .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(blogInfo)))
-                .build();
+        HttpRequest requestToCreateNewBlog = httpRequestBuilder.buildRequest(port, "/blog", "post", blogInfo);
         HttpResponse<String> responseFromCreateNewBlog = client.send(requestToCreateNewBlog, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content after trying to create new blog",
@@ -155,10 +138,7 @@ public class IntegrationTest {
     @Order(6)
     void userIsAbleToAccessAllBlogs() throws IOException, InterruptedException {
 
-        HttpRequest requestToAccessAllBlogs = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/blog?page=1&atIndex=true"))
-                .GET()
-                .build();
+        HttpRequest requestToAccessAllBlogs = httpRequestBuilder.buildRequest(port, "/blog?page=1&atIndex=true", "get", null);
         HttpResponse<String> responseFromAccessAllBlogs = client.send(requestToAccessAllBlogs, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content after trying to access all blogs",
@@ -171,10 +151,7 @@ public class IntegrationTest {
     @Order(7)
     void userIsAbleToAccessAnyParticularBlogs() throws IOException, InterruptedException {
 
-        HttpRequest requestToAccessOneBlog = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/blog/1"))
-                .GET()
-                .build();
+        HttpRequest requestToAccessOneBlog = httpRequestBuilder.buildRequest(port, "/blog/1", "get", null);
         HttpResponse<String> responseFromAccessOneBlog = client.send(requestToAccessOneBlog, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content after trying to access one blog in detail",
@@ -187,11 +164,7 @@ public class IntegrationTest {
     @Order(8)
     void loggedInUserIsAbleToUpdateHisBlogs() throws IOException, InterruptedException {
 
-        HttpRequest requestToUpdateExistingBlog = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/blog/7"))
-                .headers("Content-Type", "application/json;charset=UTF-8")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(blogInfoForUpdate)))
-                .build();
+        HttpRequest requestToUpdateExistingBlog = httpRequestBuilder.buildRequest(port, "/blog/7", "patch", blogInfoForUpdate);
         HttpResponse<String> responseFromUpdateBlog = client.send(requestToUpdateExistingBlog, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content after trying to access one blog in detail",
@@ -204,10 +177,7 @@ public class IntegrationTest {
     @Order(9)
     void loggedInUserIsAbleToDeleteHisBlogs() throws IOException, InterruptedException {
 
-        HttpRequest requestToDeleteExistingBlog = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/blog/7"))
-                .DELETE()
-                .build();
+        HttpRequest requestToDeleteExistingBlog = httpRequestBuilder.buildRequest(port, "/blog/7", "delete", null);
         HttpResponse<String> responseFromDeleteBlog = client.send(requestToDeleteExistingBlog, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content after trying to access one blog in detail",
@@ -219,8 +189,7 @@ public class IntegrationTest {
     @Test
     @Order(10)
     void returnSuccessWhenLogoutAfterLogin() throws IOException, InterruptedException {
-        HttpRequest requestToLogout = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/auth/logout")).GET().build();
+        HttpRequest requestToLogout = httpRequestBuilder.buildRequest(port, "/auth/logout", "get", null);
         HttpResponse<String> responseToLogout = client.send(requestToLogout, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content of logging out",
@@ -232,8 +201,7 @@ public class IntegrationTest {
     @Test
     @Order(11)
     void returnFailureAfterLogout() throws IOException, InterruptedException {
-        HttpRequest requestCheckIfLoggedOut = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:" + port + "/auth")).GET().build();
+        HttpRequest requestCheckIfLoggedOut = httpRequestBuilder.buildRequest(port, "/auth", "get", null);
         HttpResponse<String> responseCheckIfLoggedOut = client.send(requestCheckIfLoggedOut, HttpResponse.BodyHandlers.ofString());
 
         Assertions.assertAll("check status and content after logging out",
