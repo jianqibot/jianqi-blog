@@ -26,7 +26,7 @@ $ git clone https://github.com/jianqibot/jianqi-blog.git
 $ cd jianqi-blog 
 
 # Build app 
-mvn -Dmaven.test.skip=true package
+$ mvn -Dmaven.test.skip=true package
 
 # Build docker image
 $ docker build . -t blog
