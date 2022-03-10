@@ -1,25 +1,32 @@
 # jianqi-blog
 
 
-![build](https://img.shields.io/circleci/build/github/jianqibot/jianqi-blog/main) ![](https://img.shields.io/github/languages/top/jianqibot/jianqi-blog) ![](https://img.shields.io/github/repo-size/jianqibot/jianqi-blog)
+![build](https://img.shields.io/circleci/build/github/jianqibot/jianqi-blog/main) ![](https://img.shields.io/github/languages/top/jianqibot/jianqi-blog) ![](https://img.shields.io/github/repo-size/jianqibot/jianqi-blog) ![Coverage](.github/badges/jacoco.svg) ![Branches](.github/badges/branches.svg)
 
 
-## $ Demo
+## Demo
 
+![](./demo/login-page.png?raw=true)
+![](./demo/blogs.png?raw=true)
 
-## $ Feature
+## Feature
 
 * Frame: Maven + Spring Boot + MySQL + MyBatis + Flyway 
 * CI/CD: CircleCI
 * Deploy: docker-compose
+* API Doc: Swagger-UI
+* Test Report: JaCoCo
 
-## $ Quick Start
+## Quick Start
 
 Install [Docker](https://docs.docker.com/get-docker/) and [Docker-Compose](https://docs.docker.com/compose/install/)
 ```sh
 # Download code
 $ git clone https://github.com/jianqibot/jianqi-blog.git
 $ cd jianqi-blog 
+
+# Build app 
+mvn -Dmaven.test.skip=true package
 
 # Build docker image
 $ docker build . -t blog
@@ -33,7 +40,7 @@ $ docker-compoe up
 $ docker-compose down 
 ```
 
-## $ Api Doc
+## API Doc
 
 ```sh
 cd jianqi-blog
@@ -45,7 +52,7 @@ Here are some examples
 
 ![](./apiDoc/example/api-specific.png?raw=true)
 
-## $ Project Structure
+## Project Structure
 
 ```
 ├── docker-compose.yml
@@ -114,5 +121,6 @@ Here are some examples
 
 ```
 
-## $ ToDo
+## ToDo
 
+* write my own front-end code using React
