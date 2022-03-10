@@ -27,18 +27,17 @@ jobs:
             sudo apt-get update
             sudo apt-get install mysql-client
             mysql -h 127.0.0.1 -u root -pROOT --execute="CREATE DATABASE blogTest"
-
-
-
-      #- restore_cache:
-      #    key: zjq-{{ checksum "pom.xml" }}
+      - restore_cache:
+            keys:
+              - v1-dependencies-{{ checksum "pom.xml" }} # appends cache key with a hash of pom.xml file
+              - v1-dependencies- # fallback in case previous cache key is not found
       - run:
           name: Run Maven Test
-          command: mvn clean verify #-PmavenCentral
-      #- save_cache: # saves the project dependencies
-      #    paths:
-      #      - ~/.m2
-      #    key: zjq-{{ checksum "pom.xml" }}
+          command: mvn clean verify
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
 
 workflows:
   version: 2
