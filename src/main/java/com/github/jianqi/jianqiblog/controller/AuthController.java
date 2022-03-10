@@ -4,6 +4,9 @@ import com.github.jianqi.jianqiblog.entity.LoginResult;
 import com.github.jianqi.jianqiblog.entity.User;
 import com.github.jianqi.jianqiblog.service.AuthService;
 import com.github.jianqi.jianqiblog.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,6 +24,7 @@ import javax.inject.Inject;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+@Api(value = "manage authentication of all users", tags = "AuthController")
 @Controller
 public class AuthController {
     private static final String USERNAME_PATTERN = "[a-zA-Z\\d]{0,14}";
@@ -38,7 +42,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-
+    @ApiOperation("Check user login status")
     @GetMapping("/auth")
     @ResponseBody
     public LoginResult auth() {
@@ -47,9 +51,10 @@ public class AuthController {
                 .orElse(LoginResult.failure("ok", null));
     }
 
+    @ApiOperation("User login")
     @PostMapping("/auth/login")
     @ResponseBody
-    public LoginResult login(@RequestBody Map<String, String> loginInfo) {
+    public LoginResult login(@RequestBody @ApiParam("Existing Username & Password") Map<String, String> loginInfo) {
         String username = loginInfo.get("username");
         String password = loginInfo.get("password");
         UserDetails userDetails;
@@ -73,9 +78,11 @@ public class AuthController {
         }
     }
 
+
+    @ApiOperation("New user to register an account")
     @PostMapping("/auth/register")
     @ResponseBody
-    public LoginResult register(@RequestBody Map<String, String> registerInfo) {
+    public LoginResult register(@RequestBody @ApiParam("New Username & Password") Map<String, String> registerInfo) {
         String username = registerInfo.get("username");
         String password = registerInfo.get("password");
 
@@ -104,6 +111,7 @@ public class AuthController {
         return PATTERN_USERNAME.matcher(username).matches();
     }
 
+    @ApiOperation("User log out")
     @GetMapping("/auth/logout")
     @ResponseBody
     public LoginResult logout() {
