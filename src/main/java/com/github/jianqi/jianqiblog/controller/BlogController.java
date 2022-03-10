@@ -9,14 +9,13 @@ import com.github.jianqi.jianqiblog.service.BlogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.Map;
 
 @Api(value = "manage operation on blogs", tags = "BlogController")
-@Controller
+@RestController
 public class BlogController {
     private final BlogService blogService;
     private final AuthService authService;
@@ -30,7 +29,6 @@ public class BlogController {
 
     @ApiOperation("Fetch all blogs")
     @GetMapping("/blog")
-    @ResponseBody
     public BlogListResult getBlogs(@RequestParam("page") @ApiParam("Page Number")
                                                Integer page,
                                    @RequestParam(value = "userId", required = false) @ApiParam("User Id")
@@ -44,7 +42,6 @@ public class BlogController {
 
     @ApiOperation("Fetch blog of specific Id")
     @GetMapping("/blog/{blogId}")
-    @ResponseBody
     public BlogResult getBlogById(@PathVariable("blogId") @ApiParam("Blog Id") Integer blogId) {
         return blogService.getBlogById(blogId);
     }
@@ -52,7 +49,6 @@ public class BlogController {
 
     @ApiOperation("Create new blog")
     @PostMapping("/blog")
-    @ResponseBody
     public BlogResult postBlog(@RequestBody @ApiParam("Blog Information(title, content...) to create") Map<String, String> params) {
 
         return authService.getLoggedInUser()
@@ -63,7 +59,6 @@ public class BlogController {
 
     @ApiOperation("Modify existing blog of specific Id")
     @PatchMapping("/blog/{blogId}")
-    @ResponseBody
     public BlogResult postBlog(@PathVariable("blogId") @ApiParam("Blog Id") Integer blogId,
                                @RequestBody @ApiParam("Blog Information(title, content...) to update") Map<String, String>  params) {
 
@@ -75,7 +70,6 @@ public class BlogController {
 
     @ApiOperation("Delete existing blog of specific Id")
     @DeleteMapping("/blog/{blogId}")
-    @ResponseBody
     public BlogResult deleteBlog(@PathVariable("blogId") @ApiParam("Blog Id") Integer blogId) {
 
         return authService.getLoggedInUser()
